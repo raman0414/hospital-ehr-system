@@ -3,9 +3,14 @@
     <Sidebar :isOpen="sidebarOpen" @toggle="sidebarOpen = !sidebarOpen" />
     <div class="lg:ml-64">
       <header class="bg-hospital-700 text-white shadow-md">
-        <div class="flex items-center justify-between px-6 py-4">
+        <div class="flex items-center justify-between px-4 md:px-6 py-4">
           <div class="flex items-center">
-            <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-white mr-4">
+            <!-- Hamburger - only visible on mobile when sidebar is closed -->
+            <button
+              v-if="!sidebarOpen"
+              @click="sidebarOpen = true"
+              class="lg:hidden text-white mr-4 p-1"
+            >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -31,7 +36,15 @@
 </template>
 
 <script setup lang="ts">
-const sidebarOpen = ref(true)
+const sidebarOpen = ref(false)
+
+onMounted(() => {
+  // On desktop (lg+), sidebar should be open by default
+  if (window.innerWidth >= 1024) {
+    sidebarOpen.value = true
+  }
+})
+
 const userName = ref('')
 
 onMounted(() => {
