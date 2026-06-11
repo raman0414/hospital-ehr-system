@@ -239,8 +239,14 @@ useHead({
 })
 
 const route = useRoute()
-const { getPatient } = usePatients()
+const { patients, getPatient, initializeMockData, isLoaded } = usePatients()
 const patient = getPatient(route.params.id as string)
+
+onMounted(async () => {
+  if (!isLoaded.value || patients.value.length === 0) {
+    await initializeMockData()
+  }
+})
 
 const formatDate = (date: string) => {
   if (!date) return ''

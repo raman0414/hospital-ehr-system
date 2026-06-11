@@ -282,7 +282,7 @@ export const usePatients = () => {
   }
 
   const getPatient = (id: string) => {
-    return patients.value.find(p => p.id === id)
+    return computed(() => patients.value.find(p => p.id === id))
   }
 
   const searchPatients = (query: string) => {
