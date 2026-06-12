@@ -4,7 +4,7 @@ create table if not exists public.staff_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text not null default '',
-  approved boolean not null default false,
+  approved boolean not null default true,
   created_at timestamptz not null default now()
 );
 
@@ -15,11 +15,12 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.staff_profiles (id, email, full_name)
+  insert into public.staff_profiles (id, email, full_name, approved)
   values (
     new.id,
     coalesce(new.email, ''),
-    coalesce(new.raw_user_meta_data ->> 'full_name', '')
+    coalesce(new.raw_user_meta_data ->> 'full_name', ''),
+    true
   )
   on conflict (id) do nothing;
   return new;
@@ -31,11 +32,12 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_staff_user();
 
-insert into public.staff_profiles (id, email, full_name)
+insert into public.staff_profiles (id, email, full_name, approved)
 select
   id,
   coalesce(email, ''),
-  coalesce(raw_user_meta_data ->> 'full_name', '')
+  coalesce(raw_user_meta_data ->> 'full_name', ''),
+  true
 from auth.users
 on conflict (id) do nothing;
 

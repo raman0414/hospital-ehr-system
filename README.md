@@ -6,18 +6,10 @@ Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introdu
 
 1. In Supabase, open **SQL Editor**.
 2. Run `supabase/migrations/202606120001_create_ehr_records.sql`.
-3. Approve a staff account after it signs up:
-
-```sql
-update public.staff_profiles
-set approved = true
-where email = 'staff@example.com';
-```
-
-4. Set the variables from `.env.example` locally and in the deployment environment.
+3. Set the variables from `.env.example` locally and in the deployment environment.
 
 The migration creates the patient and vital-sign tables with row-level security.
-Only approved staff accounts can read or modify records.
+Newly registered accounts are automatically approved and can read or modify records.
 
 ## Setup
 
