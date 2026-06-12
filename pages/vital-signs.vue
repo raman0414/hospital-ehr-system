@@ -112,6 +112,10 @@
     <!-- Record Vital Signs Modal -->
     <Modal :isOpen="isModalOpen" title="Record Vital Signs" @close="closeModal">
       <form @submit.prevent="saveVitalSigns" class="space-y-6">
+        <div v-if="formError" class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
+          {{ formError }}
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Patient *</label>
@@ -232,6 +236,7 @@ const {
 const route = useRoute()
 const isModalOpen = ref(false)
 const isSaving = ref(false)
+const formError = ref('')
 const selectedPatientId = ref('')
 const selectedDate = ref('')
 
@@ -303,11 +308,13 @@ const getPainColor = (pain: number) => {
 }
 
 const openModal = () => {
+  formError.value = ''
   isModalOpen.value = true
 }
 
 const closeModal = () => {
   isModalOpen.value = false
+  formError.value = ''
   resetForm()
 }
 
@@ -330,6 +337,23 @@ const resetForm = () => {
 }
 
 const saveVitalSigns = async () => {
+  formError.value = ''
+
+  if (!formData.patientId) {
+    formError.value = 'Please select a patient.'
+    return
+  }
+
+  if (formData.temperature !== null && (formData.temperature < 30 || formData.temperature > 42)) {
+    formError.value = 'Temperature must be between 30 and 42 degrees Celsius.'
+    return
+  }
+
+  if (formData.pain < 0 || formData.pain > 10) {
+    formError.value = 'Pain scale must be between 0 and 10.'
+    return
+  }
+
   isSaving.value = true
   try {
     await addVitalSign({
@@ -348,6 +372,8 @@ const saveVitalSigns = async () => {
       ivFluid: formData.ivFluid || 'None'
     })
     closeModal()
+  } catch (error: any) {
+    formError.value = error.message || 'Unable to save vital signs.'
   } finally {
     isSaving.value = false
   }
