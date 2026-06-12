@@ -159,7 +159,7 @@ const {
   patients,
   isLoaded,
   isLoading,
-  initializeMockData,
+  loadPatients,
   getDashboardStats,
   getRecentPatients
 } = usePatients()
@@ -169,7 +169,7 @@ const recentPatients = computed(() => getRecentPatients.value)
 
 onMounted(async () => {
   if (!isLoaded.value) {
-    await initializeMockData()
+    await loadPatients()
   }
 })
 

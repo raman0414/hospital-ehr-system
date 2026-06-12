@@ -16,132 +16,155 @@ export interface VitalSign {
   createdAt: string
 }
 
-const STORAGE_KEY = 'ehr_vital_signs'
-
-const generateId = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2)
+type VitalSignRow = {
+  id: string
+  patient_id: string
+  date: string
+  time: string
+  weight: number
+  temperature: number
+  blood_pressure: string
+  pulse_rate: number
+  respiration_rate: number
+  pain: number
+  intake: number
+  output: number
+  stool: string
+  iv_fluid: string
+  created_at: string
 }
 
+const mapVitalSign = (row: VitalSignRow): VitalSign => ({
+  id: row.id,
+  patientId: row.patient_id,
+  date: row.date,
+  time: row.time.slice(0, 5),
+  weight: Number(row.weight),
+  temperature: Number(row.temperature),
+  bloodPressure: row.blood_pressure,
+  pulseRate: row.pulse_rate,
+  respirationRate: row.respiration_rate,
+  pain: row.pain,
+  intake: Number(row.intake),
+  output: Number(row.output),
+  stool: row.stool,
+  ivFluid: row.iv_fluid,
+  createdAt: row.created_at,
+})
+
+const toVitalSignRow = (vitalSign: Partial<VitalSign>) => ({
+  patient_id: vitalSign.patientId,
+  date: vitalSign.date || new Date().toISOString().split('T')[0],
+  time: vitalSign.time || new Date().toTimeString().slice(0, 5),
+  weight: vitalSign.weight || 0,
+  temperature: vitalSign.temperature || 36.5,
+  blood_pressure: vitalSign.bloodPressure || '',
+  pulse_rate: vitalSign.pulseRate || 0,
+  respiration_rate: vitalSign.respirationRate || 0,
+  pain: vitalSign.pain || 0,
+  intake: vitalSign.intake || 0,
+  output: vitalSign.output || 0,
+  stool: vitalSign.stool || '',
+  iv_fluid: vitalSign.ivFluid || '',
+})
+
 export const useVitalSigns = () => {
-  const { data: vitalSigns, isLoaded } = useLocalStorage<VitalSign[]>(STORAGE_KEY, [])
+  const { $supabase } = useNuxtApp()
+  const vitalSigns = useState<VitalSign[]>('vital-signs', () => [])
+  const isLoaded = useState('vital-signs-loaded', () => false)
+  const isLoading = useState('vital-signs-loading', () => false)
+  const errorMessage = useState('vital-signs-error', () => '')
 
-  const isLoading = ref(false)
+  const loadVitalSigns = async (force = false) => {
+    if (isLoading.value || (isLoaded.value && !force)) return
 
-  const initializeMockData = async (patients: any[]) => {
-    if (vitalSigns.value.length === 0 && patients.length > 0) {
-      isLoading.value = true
-      await new Promise(resolve => setTimeout(resolve, 300))
+    isLoading.value = true
+    errorMessage.value = ''
+    try {
+      const { data, error } = await $supabase
+        .from('vital_signs')
+        .select('*')
+        .order('created_at', { ascending: false })
 
-      const today = new Date().toISOString().split('T')[0]
-      const mockVitalSigns: VitalSign[] = []
-
-      patients.slice(0, 3).forEach((patient, idx) => {
-        mockVitalSigns.push({
-          id: generateId(),
-          patientId: patient.id,
-          date: today,
-          time: '08:00',
-          weight: 70 + idx * 5,
-          temperature: 36.5 + idx * 0.2,
-          bloodPressure: '120/80',
-          pulseRate: 72 + idx * 3,
-          respirationRate: 16 + idx,
-          pain: idx + 1,
-          intake: 1500,
-          output: 1200,
-          stool: 'Normal',
-          ivFluid: 'NS @ 100ml/hr',
-          createdAt: new Date().toISOString()
-        })
-
-        mockVitalSigns.push({
-          id: generateId(),
-          patientId: patient.id,
-          date: today,
-          time: '12:00',
-          weight: 70 + idx * 5,
-          temperature: 36.6 + idx * 0.2,
-          bloodPressure: '118/78',
-          pulseRate: 70 + idx * 3,
-          respirationRate: 16 + idx,
-          pain: idx,
-          intake: 600,
-          output: 450,
-          stool: 'None',
-          ivFluid: 'NS @ 80ml/hr',
-          createdAt: new Date().toISOString()
-        })
-      })
-
-      vitalSigns.value = mockVitalSigns
+      if (error) throw error
+      vitalSigns.value = (data as VitalSignRow[]).map(mapVitalSign)
+      isLoaded.value = true
+    } catch (error: any) {
+      errorMessage.value = error.message || 'Unable to load vital signs.'
+      throw error
+    } finally {
       isLoading.value = false
     }
   }
 
-  const addVitalSign = (vitalSignData: Partial<VitalSign>) => {
-    const newVitalSign: VitalSign = {
-      id: generateId(),
-      patientId: vitalSignData.patientId || '',
-      date: vitalSignData.date || new Date().toISOString().split('T')[0],
-      time: vitalSignData.time || new Date().toTimeString().slice(0, 5),
-      weight: vitalSignData.weight || 0,
-      temperature: vitalSignData.temperature || 36.5,
-      bloodPressure: vitalSignData.bloodPressure || '',
-      pulseRate: vitalSignData.pulseRate || 0,
-      respirationRate: vitalSignData.respirationRate || 0,
-      pain: vitalSignData.pain || 0,
-      intake: vitalSignData.intake || 0,
-      output: vitalSignData.output || 0,
-      stool: vitalSignData.stool || '',
-      ivFluid: vitalSignData.ivFluid || '',
-      createdAt: new Date().toISOString()
+  const addVitalSign = async (vitalSignData: Partial<VitalSign>) => {
+    errorMessage.value = ''
+    const { data, error } = await $supabase
+      .from('vital_signs')
+      .insert(toVitalSignRow(vitalSignData))
+      .select()
+      .single()
+
+    if (error) {
+      errorMessage.value = error.message
+      throw error
     }
 
-    vitalSigns.value = [...vitalSigns.value, newVitalSign]
-    return newVitalSign
+    const vitalSign = mapVitalSign(data as VitalSignRow)
+    vitalSigns.value = [vitalSign, ...vitalSigns.value]
+    return vitalSign
   }
 
-  const updateVitalSign = (id: string, updates: Partial<VitalSign>) => {
-    const index = vitalSigns.value.findIndex(v => v.id === id)
-    if (index !== -1) {
-      vitalSigns.value = vitalSigns.value.map((v, i) =>
-        i === index ? { ...v, ...updates } : v
-      )
-      return vitalSigns.value[index]
+  const updateVitalSign = async (id: string, updates: Partial<VitalSign>) => {
+    errorMessage.value = ''
+    const { data, error } = await $supabase
+      .from('vital_signs')
+      .update(toVitalSignRow(updates))
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      errorMessage.value = error.message
+      throw error
     }
-    return null
+
+    const vitalSign = mapVitalSign(data as VitalSignRow)
+    vitalSigns.value = vitalSigns.value.map(item => item.id === id ? vitalSign : item)
+    return vitalSign
   }
 
-  const deleteVitalSign = (id: string) => {
-    vitalSigns.value = vitalSigns.value.filter(v => v.id !== id)
+  const deleteVitalSign = async (id: string) => {
+    errorMessage.value = ''
+    const { error } = await $supabase.from('vital_signs').delete().eq('id', id)
+    if (error) {
+      errorMessage.value = error.message
+      throw error
+    }
+    vitalSigns.value = vitalSigns.value.filter(vitalSign => vitalSign.id !== id)
   }
 
   const getVitalSignsByPatient = (patientId: string) => {
-    return vitalSigns.value
-      .filter(v => v.patientId === patientId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    return vitalSigns.value.filter(vitalSign => vitalSign.patientId === patientId)
   }
 
   const getVitalSign = (id: string) => {
-    return vitalSigns.value.find(v => v.id === id)
+    return vitalSigns.value.find(vitalSign => vitalSign.id === id)
   }
 
-  const getAllVitalSigns = computed(() => {
-    return [...vitalSigns.value].sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-  })
+  const getAllVitalSigns = computed(() => vitalSigns.value)
 
   return {
     vitalSigns,
     isLoaded,
     isLoading,
-    initializeMockData,
+    errorMessage,
+    loadVitalSigns,
     addVitalSign,
     updateVitalSign,
     deleteVitalSign,
     getVitalSignsByPatient,
     getVitalSign,
-    getAllVitalSigns
+    getAllVitalSigns,
   }
 }

@@ -7,7 +7,9 @@
       Back to Patient List
     </button>
 
-    <div v-if="patient">
+    <LoadingSpinner v-if="isLoading" :loading="true" />
+
+    <div v-else-if="patient">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div class="flex items-center">
           <div class="w-16 h-16 bg-hospital-100 rounded-full flex items-center justify-center mr-4">
@@ -239,12 +241,12 @@ useHead({
 })
 
 const route = useRoute()
-const { patients, getPatient, initializeMockData, isLoaded } = usePatients()
+const { patients, getPatient, loadPatients, isLoaded, isLoading } = usePatients()
 const patient = getPatient(route.params.id as string)
 
 onMounted(async () => {
   if (!isLoaded.value || patients.value.length === 0) {
-    await initializeMockData()
+    await loadPatients()
   }
 })
 

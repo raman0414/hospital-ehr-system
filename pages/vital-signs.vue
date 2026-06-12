@@ -5,6 +5,10 @@
       <p class="text-gray-600 mt-2">Track and monitor patient vital signs</p>
     </div>
 
+    <div v-if="errorMessage" class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">
+      {{ errorMessage }}
+    </div>
+
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
       <div class="flex flex-col md:flex-row gap-4 items-end">
         <div class="flex-1">
@@ -192,8 +196,12 @@
           <button type="button" @click="closeModal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
             Cancel
           </button>
-          <button @click="saveVitalSigns" class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium">
-            Save Vital Signs
+          <button
+            @click="saveVitalSigns"
+            :disabled="isSaving"
+            class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+          >
+            {{ isSaving ? 'Saving...' : 'Save Vital Signs' }}
           </button>
         </div>
       </template>
@@ -210,20 +218,29 @@ useHead({
   title: 'Vital Signs - MedCare EHR'
 })
 
-const { patients, isLoaded: patientsLoaded, initializeMockData: initPatients } = usePatients()
-const { vitalSigns, isLoaded: vitalSignsLoaded, isLoading, initializeMockData: initVitalSigns, addVitalSign, deleteVitalSign: deleteVitalSignRecord, getAllVitalSigns } = useVitalSigns()
+const { patients, isLoaded: patientsLoaded, loadPatients } = usePatients()
+const {
+  isLoaded: vitalSignsLoaded,
+  isLoading,
+  errorMessage,
+  loadVitalSigns,
+  addVitalSign,
+  deleteVitalSign: deleteVitalSignRecord,
+  getAllVitalSigns
+} = useVitalSigns()
 
 const route = useRoute()
 const isModalOpen = ref(false)
+const isSaving = ref(false)
 const selectedPatientId = ref('')
 const selectedDate = ref('')
 
 onMounted(async () => {
   if (!patientsLoaded.value) {
-    await initPatients()
+    await loadPatients()
   }
-  if (!vitalSignsLoaded.value && patients.value.length > 0) {
-    await initVitalSigns(patients.value)
+  if (!vitalSignsLoaded.value) {
+    await loadVitalSigns()
   }
 
   // Check for patientId in query params
@@ -312,28 +329,33 @@ const resetForm = () => {
   })
 }
 
-const saveVitalSigns = () => {
-  addVitalSign({
-    patientId: formData.patientId,
-    date: formData.date,
-    time: formData.time,
-    weight: formData.weight || 0,
-    temperature: formData.temperature || 36.5,
-    bloodPressure: formData.bloodPressure || 'N/A',
-    pulseRate: formData.pulseRate || 0,
-    respirationRate: formData.respirationRate || 0,
-    pain: formData.pain,
-    intake: formData.intake || 0,
-    output: formData.output || 0,
-    stool: formData.stool || 'None',
-    ivFluid: formData.ivFluid || 'None'
-  })
-  closeModal()
+const saveVitalSigns = async () => {
+  isSaving.value = true
+  try {
+    await addVitalSign({
+      patientId: formData.patientId,
+      date: formData.date,
+      time: formData.time,
+      weight: formData.weight || 0,
+      temperature: formData.temperature || 36.5,
+      bloodPressure: formData.bloodPressure || 'N/A',
+      pulseRate: formData.pulseRate || 0,
+      respirationRate: formData.respirationRate || 0,
+      pain: formData.pain,
+      intake: formData.intake || 0,
+      output: formData.output || 0,
+      stool: formData.stool || 'None',
+      ivFluid: formData.ivFluid || 'None'
+    })
+    closeModal()
+  } finally {
+    isSaving.value = false
+  }
 }
 
-const deleteVitalSign = (id: string) => {
+const deleteVitalSign = async (id: string) => {
   if (confirm('Are you sure you want to delete this vital sign record?')) {
-    deleteVitalSignRecord(id)
+    await deleteVitalSignRecord(id)
   }
 }
 </script>

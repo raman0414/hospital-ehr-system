@@ -5,6 +5,10 @@
       <p class="text-gray-600 mt-2">Manage and view all patient records</p>
     </div>
 
+    <div v-if="errorMessage" class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">
+      {{ errorMessage }}
+    </div>
+
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1">
@@ -227,8 +231,12 @@
           <button type="button" @click="closeModal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
             Cancel
           </button>
-          <button @click="savePatient" class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium">
-            {{ editingPatient ? 'Update Patient' : 'Add Patient' }}
+          <button
+            @click="savePatient"
+            :disabled="isSaving"
+            class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+          >
+            {{ isSaving ? 'Saving...' : editingPatient ? 'Update Patient' : 'Add Patient' }}
           </button>
         </div>
       </template>
@@ -258,7 +266,8 @@ const {
   patients,
   isLoaded,
   isLoading,
-  initializeMockData,
+  errorMessage,
+  loadPatients,
   addPatient,
   updatePatient,
   deletePatient,
@@ -268,6 +277,7 @@ const {
 const searchQuery = ref('')
 const isModalOpen = ref(false)
 const isDeleteModalOpen = ref(false)
+const isSaving = ref(false)
 const editingPatient = ref<any>(null)
 const patientToDelete = ref<any>(null)
 
@@ -305,7 +315,7 @@ const filteredPatients = computed(() => {
 
 onMounted(async () => {
   if (!isLoaded.value) {
-    await initializeMockData()
+    await loadPatients()
   }
 })
 
@@ -391,13 +401,18 @@ const closeModal = () => {
   resetForm()
 }
 
-const savePatient = () => {
-  if (editingPatient.value) {
-    updatePatient(editingPatient.value.id, formData)
-  } else {
-    addPatient(formData)
+const savePatient = async () => {
+  isSaving.value = true
+  try {
+    if (editingPatient.value) {
+      await updatePatient(editingPatient.value.id, formData)
+    } else {
+      await addPatient(formData)
+    }
+    closeModal()
+  } finally {
+    isSaving.value = false
   }
-  closeModal()
 }
 
 const confirmDelete = (patient: any) => {
@@ -405,12 +420,16 @@ const confirmDelete = (patient: any) => {
   isDeleteModalOpen.value = true
 }
 
-const deletePatientConfirmed = () => {
+const deletePatientConfirmed = async () => {
   if (patientToDelete.value) {
-    deletePatient(patientToDelete.value.id)
-    patientToDelete.value = null
+    try {
+      await deletePatient(patientToDelete.value.id)
+      patientToDelete.value = null
+      isDeleteModalOpen.value = false
+    } catch {
+      return
+    }
   }
-  isDeleteModalOpen.value = false
 }
 
 const viewPatient = (id: string) => {
