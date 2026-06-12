@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-onMounted(() => {
-  const isAuthenticated = localStorage.getItem('ehr_auth')
-  if (isAuthenticated) {
-    navigateTo('/dashboard')
-  } else {
-    navigateTo('/login')
-  }
+definePageMeta({
+  layout: false
+})
+
+onMounted(async () => {
+  const { user } = useAuth()
+  await navigateTo(user.value ? '/dashboard' : '/login', { replace: true })
 })
 </script>

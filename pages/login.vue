@@ -13,6 +13,14 @@
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-6">
+          <div v-if="errorMessage" class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
+            {{ errorMessage }}
+          </div>
+
+          <div v-if="route.query.confirmed" class="rounded-lg bg-green-50 p-3 text-sm text-green-700">
+            Email confirmed. You can now sign in.
+          </div>
+
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <input
@@ -37,14 +45,6 @@
             />
           </div>
 
-          <div class="flex items-center justify-between">
-            <label class="flex items-center">
-              <input type="checkbox" v-model="form.remember" class="w-4 h-4 text-hospital-600 border-gray-300 rounded focus:ring-hospital-500" />
-              <span class="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
-            <a href="#" class="text-sm text-hospital-600 hover:text-hospital-700 font-medium">Forgot password?</a>
-          </div>
-
           <button
             type="submit"
             :disabled="isLoading"
@@ -62,7 +62,12 @@
         </form>
 
         <div class="mt-6 text-center">
-          <p class="text-xs text-gray-500">Demo Mode: Use any email and password to sign in</p>
+          <p class="text-sm text-gray-600">
+            Need an account?
+            <NuxtLink to="/signup" class="font-medium text-hospital-600 hover:text-hospital-700">
+              Create one
+            </NuxtLink>
+          </p>
         </div>
       </div>
     </div>
@@ -74,28 +79,37 @@ definePageMeta({
   layout: false
 })
 
+const route = useRoute()
+const { user, signIn } = useAuth()
+
 useHead({
   title: 'Login - MedCare EHR'
 })
 
 const form = reactive({
   email: '',
-  password: '',
-  remember: false
+  password: ''
 })
 
 const isLoading = ref(false)
+const errorMessage = ref('')
+
+onMounted(() => {
+  if (user.value) {
+    navigateTo('/dashboard')
+  }
+})
 
 const handleLogin = async () => {
+  errorMessage.value = ''
   isLoading.value = true
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  isLoading.value = false
-
-  if (process.client) {
-    localStorage.setItem('ehr_auth', 'true')
-    localStorage.setItem('ehr_user_name', form.email.split('@')[0])
+  try {
+    await signIn(form.email, form.password)
+    await navigateTo('/dashboard')
+  } catch (error: any) {
+    errorMessage.value = error.message || 'Unable to sign in. Please try again.'
+  } finally {
+    isLoading.value = false
   }
-
-  navigateTo('/dashboard')
 }
 </script>

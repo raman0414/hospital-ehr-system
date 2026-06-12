@@ -22,8 +22,12 @@
           </div>
           <div class="flex items-center space-x-4">
             <span class="text-sm hidden md:block">{{ userName }}</span>
-            <button @click="handleLogout" class="bg-hospital-600 hover:bg-hospital-500 px-4 py-2 rounded-md text-sm transition-colors font-medium">
-              Logout
+            <button
+              @click="handleLogout"
+              :disabled="isLoggingOut"
+              class="bg-hospital-600 hover:bg-hospital-500 px-4 py-2 rounded-md text-sm transition-colors font-medium disabled:opacity-50"
+            >
+              {{ isLoggingOut ? 'Logging out...' : 'Logout' }}
             </button>
           </div>
         </div>
@@ -37,6 +41,8 @@
 
 <script setup lang="ts">
 const sidebarOpen = ref(false)
+const isLoggingOut = ref(false)
+const { user, signOut } = useAuth()
 
 onMounted(() => {
   // On desktop (lg+), sidebar should be open by default
@@ -45,19 +51,16 @@ onMounted(() => {
   }
 })
 
-const userName = ref('')
-
-onMounted(() => {
-  if (process.client) {
-    userName.value = localStorage.getItem('ehr_user_name') || 'User'
-  }
+const userName = computed(() => {
+  return user.value?.user_metadata?.full_name || user.value?.email || 'User'
 })
 
-const handleLogout = () => {
-  if (process.client) {
-    localStorage.removeItem('ehr_auth')
-    localStorage.removeItem('ehr_user_name')
+const handleLogout = async () => {
+  isLoggingOut.value = true
+  try {
+    await signOut()
+  } finally {
+    isLoggingOut.value = false
   }
-  navigateTo('/login')
 }
 </script>

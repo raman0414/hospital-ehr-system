@@ -3,7 +3,7 @@ export const useLocalStorage = <T>(key: string, defaultValue: T) => {
   const isLoaded = ref(false)
 
   const load = () => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         const stored = localStorage.getItem(key)
         if (stored) {
@@ -17,7 +17,7 @@ export const useLocalStorage = <T>(key: string, defaultValue: T) => {
   }
 
   const save = () => {
-    if (process.client) {
+    if (import.meta.client) {
       try {
         localStorage.setItem(key, JSON.stringify(data.value))
       } catch (error) {
@@ -27,7 +27,7 @@ export const useLocalStorage = <T>(key: string, defaultValue: T) => {
   }
 
   const clear = () => {
-    if (process.client) {
+    if (import.meta.client) {
       localStorage.removeItem(key)
       data.value = defaultValue
     }

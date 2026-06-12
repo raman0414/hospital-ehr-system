@@ -58,7 +58,7 @@ const confirmDelete = () => {
 }
 
 watch(() => props.isOpen, (newVal) => {
-  if (process.client) {
+  if (import.meta.client) {
     if (newVal) {
       document.body.style.overflow = 'hidden'
     } else {
