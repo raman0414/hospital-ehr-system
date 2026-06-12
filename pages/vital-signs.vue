@@ -98,6 +98,9 @@
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vital.output }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900 max-w-32 truncate">{{ vital.ivFluid }}</td>
                 <td class="px-4 py-3 text-sm">
+                  <button @click="editVitalSign(vital)" class="text-hospital-600 hover:text-hospital-800 font-medium transition-colors mr-3">
+                    Edit
+                  </button>
                   <button @click="deleteVitalSign(vital.id)" class="text-red-600 hover:text-red-800 font-medium transition-colors">
                     Delete
                   </button>
@@ -109,8 +112,8 @@
       </LoadingSpinner>
     </div>
 
-    <!-- Record Vital Signs Modal -->
-    <Modal :isOpen="isModalOpen" title="Record Vital Signs" @close="closeModal">
+    <!-- Record / Edit Vital Signs Modal -->
+    <Modal :isOpen="isModalOpen" :title="editId ? 'Edit Vital Signs' : 'Record Vital Signs'" @close="closeModal">
       <form @submit.prevent="saveVitalSigns" class="space-y-6">
         <div v-if="formError" class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
           {{ formError }}
@@ -205,7 +208,7 @@
             :disabled="isSaving"
             class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
           >
-            {{ isSaving ? 'Saving...' : 'Save Vital Signs' }}
+            {{ isSaving ? 'Saving...' : (editId ? 'Update Vital Signs' : 'Save Vital Signs') }}
           </button>
         </div>
       </template>
@@ -229,6 +232,7 @@ const {
   errorMessage,
   loadVitalSigns,
   addVitalSign,
+  updateVitalSign,
   deleteVitalSign: deleteVitalSignRecord,
   getAllVitalSigns
 } = useVitalSigns()
@@ -237,6 +241,7 @@ const route = useRoute()
 const isModalOpen = ref(false)
 const isSaving = ref(false)
 const formError = ref('')
+const editId = ref('')
 const selectedPatientId = ref('')
 const selectedDate = ref('')
 
@@ -309,6 +314,29 @@ const getPainColor = (pain: number) => {
 
 const openModal = () => {
   formError.value = ''
+  editId.value = ''
+  resetForm()
+  isModalOpen.value = true
+}
+
+const editVitalSign = (vital: any) => {
+  formError.value = ''
+  editId.value = vital.id
+  Object.assign(formData, {
+    patientId: vital.patientId,
+    date: vital.date,
+    time: vital.time,
+    weight: vital.weight,
+    temperature: vital.temperature,
+    bloodPressure: vital.bloodPressure,
+    pulseRate: vital.pulseRate,
+    respirationRate: vital.respirationRate,
+    pain: vital.pain,
+    intake: vital.intake,
+    output: vital.output,
+    stool: vital.stool,
+    ivFluid: vital.ivFluid
+  })
   isModalOpen.value = true
 }
 
@@ -356,7 +384,7 @@ const saveVitalSigns = async () => {
 
   isSaving.value = true
   try {
-    await addVitalSign({
+    const payload = {
       patientId: formData.patientId,
       date: formData.date,
       time: formData.time,
@@ -370,7 +398,13 @@ const saveVitalSigns = async () => {
       output: formData.output || 0,
       stool: formData.stool || 'None',
       ivFluid: formData.ivFluid || 'None'
-    })
+    }
+
+    if (editId.value) {
+      await updateVitalSign(editId.value, payload)
+    } else {
+      await addVitalSign(payload)
+    }
     closeModal()
   } catch (error: any) {
     formError.value = error.message || 'Unable to save vital signs.'

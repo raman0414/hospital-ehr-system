@@ -74,6 +74,9 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ med.prescribingDoctor }}</td>
                 <td class="px-4 py-3 text-sm">
+                  <button @click="editMedication(med)" class="text-hospital-600 hover:text-hospital-800 font-medium transition-colors mr-3">
+                    Edit
+                  </button>
                   <button @click="deleteMed(med.id)" class="text-red-600 hover:text-red-800 font-medium transition-colors">
                     Delete
                   </button>
@@ -85,8 +88,8 @@
       </LoadingSpinner>
     </div>
 
-    <!-- Add Medication Modal -->
-    <Modal :isOpen="isModalOpen" title="Add Medication" @close="closeModal">
+    <!-- Add / Edit Medication Modal -->
+    <Modal :isOpen="isModalOpen" :title="editId ? 'Edit Medication' : 'Add Medication'" @close="closeModal">
       <form @submit.prevent="saveMedication" class="space-y-6">
         <div v-if="formError" class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
           {{ formError }}
@@ -150,7 +153,7 @@
             :disabled="isSaving"
             class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
           >
-            {{ isSaving ? 'Saving...' : 'Save Medication' }}
+            {{ isSaving ? 'Saving...' : (editId ? 'Update Medication' : 'Save Medication') }}
           </button>
         </div>
       </template>
@@ -174,6 +177,7 @@ const {
   errorMessage,
   loadMedications,
   addMedication,
+  updateMedication,
   deleteMedication: deleteMedRecord,
   getAllMedications
 } = useMedications()
@@ -182,6 +186,7 @@ const route = useRoute()
 const isModalOpen = ref(false)
 const isSaving = ref(false)
 const formError = ref('')
+const editId = ref('')
 const selectedPatientId = ref('')
 
 onMounted(async () => {
@@ -231,6 +236,24 @@ const getPatientRoom = (patientId: string) => {
 
 const openModal = () => {
   formError.value = ''
+  editId.value = ''
+  resetForm()
+  isModalOpen.value = true
+}
+
+const editMedication = (med: any) => {
+  formError.value = ''
+  editId.value = med.id
+  Object.assign(formData, {
+    patientId: med.patientId,
+    name: med.name,
+    dosage: med.dosage,
+    frequency: med.frequency,
+    startDate: med.startDate,
+    endDate: med.endDate || '',
+    prescribingDoctor: med.prescribingDoctor,
+    notes: med.notes || ''
+  })
   isModalOpen.value = true
 }
 
@@ -263,7 +286,7 @@ const saveMedication = async () => {
 
   isSaving.value = true
   try {
-    await addMedication({
+    const payload = {
       patientId: formData.patientId,
       name: formData.name,
       dosage: formData.dosage,
@@ -272,7 +295,13 @@ const saveMedication = async () => {
       endDate: formData.endDate || null,
       prescribingDoctor: formData.prescribingDoctor,
       notes: formData.notes
-    })
+    }
+
+    if (editId.value) {
+      await updateMedication(editId.value, payload)
+    } else {
+      await addMedication(payload)
+    }
     closeModal()
   } catch (error: any) {
     formError.value = error.message || 'Unable to save medication.'

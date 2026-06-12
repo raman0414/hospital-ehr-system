@@ -70,6 +70,9 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ lab.referenceRange || 'N/A' }}</td>
                 <td class="px-4 py-3 text-sm">
+                  <button @click="editLabResult(lab)" class="text-hospital-600 hover:text-hospital-800 font-medium transition-colors mr-3">
+                    Edit
+                  </button>
                   <button @click="deleteLab(lab.id)" class="text-red-600 hover:text-red-800 font-medium transition-colors">
                     Delete
                   </button>
@@ -81,8 +84,8 @@
       </LoadingSpinner>
     </div>
 
-    <!-- Add Lab Result Modal -->
-    <Modal :isOpen="isModalOpen" title="Record Lab Result" @close="closeModal">
+    <!-- Record / Edit Lab Result Modal -->
+    <Modal :isOpen="isModalOpen" :title="editId ? 'Edit Lab Result' : 'Record Lab Result'" @close="closeModal">
       <form @submit.prevent="saveLabResult" class="space-y-6">
         <div v-if="formError" class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
           {{ formError }}
@@ -141,7 +144,7 @@
             :disabled="isSaving"
             class="px-6 py-2 bg-hospital-600 hover:bg-hospital-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
           >
-            {{ isSaving ? 'Saving...' : 'Save Lab Result' }}
+            {{ isSaving ? 'Saving...' : (editId ? 'Update Lab Result' : 'Save Lab Result') }}
           </button>
         </div>
       </template>
@@ -165,6 +168,7 @@ const {
   errorMessage,
   loadLabResults,
   addLabResult,
+  updateLabResult,
   deleteLabResult: deleteLabRecord,
   getAllLabResults
 } = useLabResults()
@@ -173,6 +177,7 @@ const route = useRoute()
 const isModalOpen = ref(false)
 const isSaving = ref(false)
 const formError = ref('')
+const editId = ref('')
 const selectedPatientId = ref('')
 
 onMounted(async () => {
@@ -221,6 +226,23 @@ const getPatientRoom = (patientId: string) => {
 
 const openModal = () => {
   formError.value = ''
+  editId.value = ''
+  resetForm()
+  isModalOpen.value = true
+}
+
+const editLabResult = (lab: any) => {
+  formError.value = ''
+  editId.value = lab.id
+  Object.assign(formData, {
+    patientId: lab.patientId,
+    testName: lab.testName,
+    date: lab.date,
+    resultValue: lab.resultValue,
+    referenceRange: lab.referenceRange || '',
+    unit: lab.unit || '',
+    notes: lab.notes || ''
+  })
   isModalOpen.value = true
 }
 
@@ -252,7 +274,7 @@ const saveLabResult = async () => {
 
   isSaving.value = true
   try {
-    await addLabResult({
+    const payload = {
       patientId: formData.patientId,
       testName: formData.testName,
       date: formData.date,
@@ -260,7 +282,13 @@ const saveLabResult = async () => {
       referenceRange: formData.referenceRange,
       unit: formData.unit,
       notes: formData.notes
-    })
+    }
+
+    if (editId.value) {
+      await updateLabResult(editId.value, payload)
+    } else {
+      await addLabResult(payload)
+    }
     closeModal()
   } catch (error: any) {
     formError.value = error.message || 'Unable to save lab result.'
