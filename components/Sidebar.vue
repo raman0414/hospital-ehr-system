@@ -51,6 +51,20 @@
             </svg>
             <span class="ml-3">Vital Signs</span>
           </NuxtLink>
+
+          <NuxtLink to="/medications" @click="closeOnMobile" class="flex items-center p-3 rounded-lg hover:bg-hospital-700 transition-colors group" active-class="bg-hospital-700">
+            <svg class="w-5 h-5 text-gray-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span class="ml-3">Medications</span>
+          </NuxtLink>
+
+          <NuxtLink to="/lab-results" @click="closeOnMobile" class="flex items-center p-3 rounded-lg hover:bg-hospital-700 transition-colors group" active-class="bg-hospital-700">
+            <svg class="w-5 h-5 text-gray-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+            <span class="ml-3">Lab Results</span>
+          </NuxtLink>
         </nav>
 
         <div class="mt-auto pt-8">
