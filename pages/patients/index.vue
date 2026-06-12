@@ -51,7 +51,7 @@
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient ID</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Room</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Location</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Diagnosis</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -71,7 +71,7 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-900">{{ patient.patientIdNumber }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ patient.hospitalRoom }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ patient.hospitalRoom }} - Bed {{ patient.bedNumber }}</td>
                 <td class="px-6 py-4">
                   <div class="text-sm text-gray-900 max-w-xs truncate">{{ patient.admittingDiagnoses }}</div>
                 </td>
@@ -116,6 +116,10 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Hospital Room *</label>
             <input v-model="formData.hospitalRoom" required type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hospital-500 focus:border-hospital-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Bed Number *</label>
+            <input v-model="formData.bedNumber" required type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hospital-500 focus:border-hospital-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Sex *</label>
@@ -284,6 +288,7 @@ const patientToDelete = ref<any>(null)
 const formData = reactive({
   name: '',
   hospitalRoom: '',
+  bedNumber: '',
   sex: 'Male' as 'Male' | 'Female',
   address: '',
   email: '',
@@ -335,6 +340,7 @@ const resetForm = () => {
   Object.assign(formData, {
     name: '',
     hospitalRoom: '',
+    bedNumber: '',
     sex: 'Male',
     address: '',
     email: '',
@@ -372,6 +378,7 @@ const editPatient = (patient: any) => {
   Object.assign(formData, {
     name: patient.name,
     hospitalRoom: patient.hospitalRoom,
+    bedNumber: patient.bedNumber,
     sex: patient.sex,
     address: patient.address,
     email: patient.email,

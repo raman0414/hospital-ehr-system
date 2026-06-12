@@ -20,7 +20,7 @@
           >
             <option value="">All Patients</option>
             <option v-for="patient in patients" :key="patient.id" :value="patient.id">
-              {{ patient.name }} - {{ patient.hospitalRoom }}
+              {{ patient.name }} - {{ patient.hospitalRoom }} (Bed {{ patient.bedNumber }})
             </option>
           </select>
         </div>
@@ -94,7 +94,7 @@
             <select v-model="formData.patientId" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-hospital-500 focus:border-hospital-500">
               <option value="">Select Patient</option>
               <option v-for="patient in patients" :key="patient.id" :value="patient.id">
-                {{ patient.name }} - {{ patient.hospitalRoom }}
+                {{ patient.name }} - {{ patient.hospitalRoom }} (Bed {{ patient.bedNumber }})
               </option>
             </select>
           </div>
@@ -216,7 +216,7 @@ const getPatientName = (patientId: string) => {
 
 const getPatientRoom = (patientId: string) => {
   const patient = patients.value.find(p => p.id === patientId)
-  return patient?.hospitalRoom || ''
+  return patient ? `${patient.hospitalRoom} - Bed ${patient.bedNumber}` : ''
 }
 
 const openModal = () => {

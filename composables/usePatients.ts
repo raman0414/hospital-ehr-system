@@ -2,6 +2,7 @@ export interface Patient {
   id: string
   name: string
   hospitalRoom: string
+  bedNumber: string
   patientIdNumber: string
   sex: 'Male' | 'Female'
   address: string
@@ -42,6 +43,7 @@ type PatientRow = {
   id: string
   name: string
   hospital_room: string
+  bed_number: string
   patient_id_number: string
   sex: 'Male' | 'Female'
   address: string
@@ -71,6 +73,7 @@ const mapPatient = (row: PatientRow): Patient => ({
   id: row.id,
   name: row.name,
   hospitalRoom: row.hospital_room,
+  bedNumber: row.bed_number,
   patientIdNumber: row.patient_id_number,
   sex: row.sex,
   address: row.address,
@@ -99,6 +102,7 @@ const mapPatient = (row: PatientRow): Patient => ({
 const toPatientRow = (patient: Partial<Patient>) => ({
   name: patient.name || '',
   hospital_room: patient.hospitalRoom || '',
+  bed_number: patient.bedNumber || '',
   sex: patient.sex || 'Male',
   address: patient.address || '',
   email: patient.email || '',
@@ -219,7 +223,8 @@ export const usePatients = () => {
     return patients.value.filter(patient =>
       patient.name.toLowerCase().includes(lowerQuery) ||
       patient.patientIdNumber.toLowerCase().includes(lowerQuery) ||
-      patient.hospitalRoom.toLowerCase().includes(lowerQuery)
+      patient.hospitalRoom.toLowerCase().includes(lowerQuery) ||
+      patient.bedNumber.toLowerCase().includes(lowerQuery)
     )
   }
 

@@ -88,7 +88,7 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-900">{{ patient.name }}</p>
-                  <p class="text-sm text-gray-500">{{ patient.hospitalRoom }}</p>
+                  <p class="text-sm text-gray-500">{{ patient.hospitalRoom }} - Bed {{ patient.bedNumber }}</p>
                 </div>
               </div>
               <div class="text-right">

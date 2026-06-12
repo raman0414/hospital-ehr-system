@@ -14,35 +14,35 @@ BEGIN
   ---------------------------------------------------------------------------
   -- PATIENTS
   ---------------------------------------------------------------------------
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1001', 'James Smith', '101A', 'Male', '1985-04-12', 'Pneumonia', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p1_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1001', 'James Smith', '101', 'A', 'Male', '1985-04-12', 'Pneumonia', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p1_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1002', 'Maria Garcia', '102B', 'Female', '1972-11-05', 'Type 2 Diabetes Complications', 'Dr. Mark Sloan', false, v_user_id) RETURNING id INTO p2_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1002', 'Maria Garcia', '102', 'B', 'Female', '1972-11-05', 'Type 2 Diabetes Complications', 'Dr. Mark Sloan', false, v_user_id) RETURNING id INTO p2_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1003', 'Robert Johnson', 'ICU-1', 'Male', '1960-08-22', 'Myocardial Infarction', 'Dr. Gregory House', true, v_user_id) RETURNING id INTO p3_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1003', 'Robert Johnson', 'ICU-1', '1', 'Male', '1960-08-22', 'Myocardial Infarction', 'Dr. Gregory House', true, v_user_id) RETURNING id INTO p3_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1004', 'Linda Williams', '104C', 'Female', '1990-02-15', 'Appendicitis', 'Dr. Meredith Grey', false, v_user_id) RETURNING id INTO p4_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1004', 'Linda Williams', '104', 'C', 'Female', '1990-02-15', 'Appendicitis', 'Dr. Meredith Grey', false, v_user_id) RETURNING id INTO p4_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1005', 'Michael Brown', '105A', 'Male', '1988-07-30', 'Fractured Femur', 'Dr. Owen Hunt', false, v_user_id) RETURNING id INTO p5_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1005', 'Michael Brown', '105', 'A', 'Male', '1988-07-30', 'Fractured Femur', 'Dr. Owen Hunt', false, v_user_id) RETURNING id INTO p5_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1006', 'Patricia Davis', '106B', 'Female', '1955-12-11', 'COPD Exacerbation', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p6_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1006', 'Patricia Davis', '106', 'B', 'Female', '1955-12-11', 'COPD Exacerbation', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p6_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1007', 'William Miller', 'ICU-2', 'Male', '1945-03-25', 'Septic Shock', 'Dr. Gregory House', true, v_user_id) RETURNING id INTO p7_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1007', 'William Miller', 'ICU-2', '2', 'Male', '1945-03-25', 'Septic Shock', 'Dr. Gregory House', true, v_user_id) RETURNING id INTO p7_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1008', 'Elizabeth Wilson', '108A', 'Female', '2001-09-08', 'Asthma Attack', 'Dr. Mark Sloan', false, v_user_id) RETURNING id INTO p8_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1008', 'Elizabeth Wilson', '108', 'A', 'Female', '2001-09-08', 'Asthma Attack', 'Dr. Mark Sloan', false, v_user_id) RETURNING id INTO p8_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1009', 'David Moore', '109C', 'Male', '1979-06-18', 'Kidney Stones', 'Dr. Meredith Grey', false, v_user_id) RETURNING id INTO p9_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1009', 'David Moore', '109', 'C', 'Male', '1979-06-18', 'Kidney Stones', 'Dr. Meredith Grey', false, v_user_id) RETURNING id INTO p9_id;
 
-  INSERT INTO public.patients (patient_id_number, name, hospital_room, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
-  VALUES ('PT-1010', 'Jennifer Taylor', '110B', 'Female', '1995-01-02', 'Migraine', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p10_id;
+  INSERT INTO public.patients (patient_id_number, name, hospital_room, bed_number, sex, date_of_birth, admitting_diagnoses, attending_physician, is_icu, created_by)
+  VALUES ('PT-1010', 'Jennifer Taylor', '110', 'B', 'Female', '1995-01-02', 'Migraine', 'Dr. Sarah Connor', false, v_user_id) RETURNING id INTO p10_id;
 
   ---------------------------------------------------------------------------
   -- VITAL SIGNS

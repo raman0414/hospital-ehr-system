@@ -17,7 +17,7 @@
           </div>
           <div>
             <h1 class="text-3xl font-bold text-gray-900">{{ patient.name }}</h1>
-            <p class="text-gray-600">{{ patient.hospitalRoom }} | {{ patient.patientIdNumber }}</p>
+            <p class="text-gray-600">{{ patient.hospitalRoom }} - Bed {{ patient.bedNumber }} | {{ patient.patientIdNumber }}</p>
           </div>
         </div>
         <div class="flex gap-3 mt-4 md:mt-0">
@@ -140,7 +140,7 @@
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-500 mb-1">Hospital Room</label>
-                <p class="text-gray-900 font-semibold text-lg">{{ patient.hospitalRoom }}</p>
+                <p class="text-gray-900 font-semibold text-lg">{{ patient.hospitalRoom }} - Bed {{ patient.bedNumber }}</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-500 mb-1">Patient ID</label>
